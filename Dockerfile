@@ -4,10 +4,14 @@ ENV container docker
 ENV LC_ALL C
 ENV DEBIAN_FRONTEND noninteractive
 
+COPY common /common
+RUN chmod +x /common/*.sh
+
 RUN apt-get update \
     && apt-get install -y systemd systemd-sysv \
     bash-completion \
     nano \
+    perl perl-base openssh-client \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
 
@@ -29,7 +33,6 @@ VOLUME [ "/sys/fs/cgroup" ]
 
 CMD ["/lib/systemd/systemd"]
 
-
 FROM base as server
 
 RUN apt-get update \
@@ -39,10 +42,7 @@ RUN apt-get update \
 
 # Import oar.conf
 COPY --chown=oar:oar oar.conf /etc/oar/oar.conf
-# Import resource_manager_cgroups.pl (TOREMOVE)
 COPY --chown=oar:oar job_resource_manager_cgroups.pl /etc/oar/job_resource_manager_cgroups.pl
-
-COPY common /common
 
 RUN postgresql_main=$(find /etc/postgresql -name "main") \
     && sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/" ${postgresql_main}/postgresql.conf \
@@ -60,7 +60,29 @@ RUN apt-get update \
     && apt-get install -y oar-node
 
 COPY --chown=oar:oar oar.conf /etc/oar/oar.conf
-
 # copy oar keys from server 
 COPY --chown=oar:oar --from=server /var/lib/oar/.ssh /var/lib/oar/.ssh
-#RUN chown -R oar:oar /var/lib/oar/.ssh
+
+FROM base as frontend
+
+RUN apt-get update \
+   && apt-get install -y libsort-naturally-perl libjson-perl libyaml-perl \
+   libappconfig-perl libtie-ixhash-perl libwww-perl libcgi-fast-perl \
+   libapache2-mod-fcgid php php-fpm libapache2-mod-php php-pgsql \
+   libjs-jquery php-apcu spawn-fcgi fcgiwrap \
+   apache2 libapache2-mod-php
+
+RUN apt-get install -y oar-web-status oar-user oar-user-pgsql oar-common \
+    && apt-get clean
+
+COPY --chown=oar:oar oar.conf /etc/oar/oar.conf
+COPY --chown=oar:oar --from=server /var/lib/oar/.ssh /var/lib/oar/.ssh
+
+# Monika congiuration 
+RUN a2enmod cgi \
+    && sed -e "s/^\(hostname = \).*/\1server/" -i /etc/oar/monika.conf
+
+# Drawgantt configuration 
+RUN sed -i "s/\$CONF\['db_server'\]=\"127.0.0.1\"/\$CONF\['db_server'\]=\"server\"/" /etc/oar/drawgantt-config.inc.php
+
+CMD ["/lib/systemd/systemd"]
