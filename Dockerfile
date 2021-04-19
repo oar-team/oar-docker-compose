@@ -4,16 +4,22 @@ ENV container docker
 ENV LC_ALL C
 ENV DEBIAN_FRONTEND noninteractive
 
+RUN apt-get update \
+    && apt-get install -y systemd systemd-sysv \
+    vim bash-completion apt-transport-https \
+    ca-certificates psmisc openssh-client curl wget iptables socat pciutils \
+    nmap locales net-tools iproute2 net-tools perl perl-base \
+    taktuk libdbi-perl libsort-versions-perl libdbd-pg-perl\
+    make gcc \
+    postgresql-client inetutils-ping git tmux openssh-server netcat \
+    procps libdatetime-perl libterm-ui-perl rsync socat \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 COPY common /common
 RUN chmod +x /common/*.sh
 
-RUN apt-get update \
-    && apt-get install -y systemd systemd-sysv \
-    bash-completion \
-    nano \
-    perl perl-base openssh-client \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+RUN /common/create_users.sh && /common/generate_ssh_keys.sh
 
 RUN rm -f /lib/systemd/system/multi-user.target.wants/* \
     /etc/systemd/system/*.wants/* \
@@ -26,8 +32,8 @@ RUN rm -f /lib/systemd/system/multi-user.target.wants/* \
 RUN echo "DefaultTimeoutStartSec=5s" >> /etc/systemd/system.conf \
     && echo "DefaultTimeoutStopSec=5s" >> /etc/systemd/system.conf
 
-RUN useradd -m user1 -s /bin/bash \
-    && useradd -m user2 -s /bin/bash
+#RUN useradd -m user1 -s /bin/bash \
+#    && useradd -m user2 -s /bin/bash
 
 VOLUME [ "/sys/fs/cgroup" ]
 
@@ -36,20 +42,20 @@ CMD ["/lib/systemd/systemd"]
 FROM base as server
 
 RUN apt-get update \
-    && apt-get install -y oar-server oar-server-pgsql oar-user oar-user-pgsql postgresql libjson-perl \
+    && apt-get install -y postgresql libjson-perl \
     taktuk \
     && apt-get clean
 
 # Import oar.conf
-COPY --chown=oar:oar oar.conf /etc/oar/oar.conf
-COPY --chown=oar:oar job_resource_manager_cgroups.pl /etc/oar/job_resource_manager_cgroups.pl
+#COPY --chown=oar:oar oar.conf /etc/oar/oar.conf
+#COPY --chown=oar:oar job_resource_manager_cgroups.pl /etc/oar/job_resource_manager_cgroups.pl
 
 RUN postgresql_main=$(find /etc/postgresql -name "main") \
     && sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/" ${postgresql_main}/postgresql.conf \
     && echo "host all all 0.0.0.0/0 md5" >> ${postgresql_main}/pg_hba.conf
 
 # Disable oar-server before provisioning
-RUN systemctl disable oar-server
+#RUN systemctl disable oar-server
 RUN systemctl enable postgresql
 
 CMD ["/lib/systemd/systemd"]
