@@ -39,29 +39,25 @@ tar xf $TARBALL -C $SRCDIR
 [ -n "${VERSION}" ] || fail "error: fail to retrieve OAR version"
 SRCDIR=$SRCDIR/oar-${VERSION}
 
-# Install OAR server
-make -C $SRCDIR PREFIX=/usr/local server-build
-make -C $SRCDIR PREFIX=/usr/local server-install
-make -C $SRCDIR PREFIX=/usr/local server-setup
+# Install OAR
+make -C $SRCDIR PREFIX=/usr/local node-build
+make -C $SRCDIR PREFIX=/usr/local node-install
+make -C $SRCDIR PREFIX=/usr/local node-setup
 
 # Install OAR user cli (oarnodes, oarstat ...)
-make -C $SRCDIR PREFIX=/usr/local user-build
-make -C $SRCDIR PREFIX=/usr/local user-install 
-make -C $SRCDIR PREFIX=/usr/local user-setup 
+#make -C $SRCDIR PREFIX=/usr/local user-build
+#make -C $SRCDIR PREFIX=/usr/local user-install 
+#make -C $SRCDIR PREFIX=/usr/local user-setup 
 
 # Copy initd scripts
-if [ -f /usr/local/share/oar/oar-server/init.d/oar-server ]; then
-    cat /usr/local/share/oar/oar-server/init.d/oar-server > /etc/init.d/oar-server
-    chmod +x  /etc/init.d/oar-server
+if [ -f /usr/local/share/oar/oar-node/init.d/oar-node ]; then
+    cat /usr/local/share/oar/oar-node/init.d/oar-node > /etc/init.d/oar-node
+    chmod +x  /etc/init.d/oar-node
 fi
 
-if [ -f /usr/local/share/oar/oar-server/default/oar-server ]; then
-    cat /usr/local/share/oar/oar-server/default/oar-server > /etc/default/oar-server
+if [ -f /usr/local/share/oar/oar-node/default/oar-node ]; then
+    cat /usr/local/share/oar/oar-node/default/oar-node > /etc/default/oar-node
 fi
-
-#if [ -f /usr/local/share/oar/oar-server/job_resource_manager_cgroups.pl ]; then
-#    ln -sf /usr/local/share/oar/oar-server/job_resource_manager_cgroups.pl /etc/oar/job_resource_manager_cgroups.pl
-#fi
 
 cp /common/oar2.conf /etc/oar/oar.conf
 chown oar:oar /etc/oar/oar.conf
@@ -69,8 +65,3 @@ chmod 600 /etc/oar/oar.conf
 
 # OAR SSH KEYS the same for all nodes 
 /common/configure_oar_ssh_keys.sh
-
-## the script provided by oar-2.5.8 failed w/ docker-compose 
-cp /common/job_resource_manager_cgroups.pl /etc/oar/job_resource_manager_cgroups.pl
-
-

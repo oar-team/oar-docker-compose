@@ -9,8 +9,7 @@ DIR=`dirname "$AUTHORIZED_KEYS"`
 echo "Installing OAR ssh keys to $DIR"
 mkdir -p "$DIR"
 chmod 700 "$DIR"
-cat /etc/skel/.ssh/authorized_keys >> "$AUTHORIZED_KEYS"
-echo "environment=\"OAR_KEY=1\" $(cat $AUTHORIZED_KEYS)" > $AUTHORIZED_KEYS
+echo "environment=\"OAR_KEY=1\" $(cat /etc/skel/.ssh/authorized_keys)" > $AUTHORIZED_KEYS
 cat /etc/skel/.ssh/id_rsa.pub > $DIR/id_rsa.pub
 cat /etc/skel/.ssh/id_rsa > $DIR/id_rsa
 
