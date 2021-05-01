@@ -3,16 +3,80 @@ set -ue
 
 trap 'echo trap signal TERM' 15 # HUP INT QUIT PIPE TERM
 
-log_install="/log_install"
+log="/log_provisioning"
 
-role=$(cat /etc/role)
+if [ -f "/srv/.env_oar_provisoning.sh" ]; then
+    source /srv/.env_oar_provisoning.sh
+fi
 
-if [ ! -f /oar_provisioned ]; then
+: ''${AUTO_PROVISIONING=1}
+: ''${SRC:=""}
+#: ''${TARBALL:=""}
+: ''${TARBALL:="https://github.com/oar-team/oar3/archive/refs/heads/master.tar.gz"}
+
+if (( $AUTO_PROVISIONING==0 )); then
+    echo "AUTO_PROVISIONING disabled" >> $log
+    exit 0
+fi
+
+IFS='.' read DEBIAN_VERSION DEBIAN_VERSION_MINOR < /etc/debian_version
+
+TMPDIR=$(mktemp -d --tmpdir install_oar.XXXXXXXX)
+SRCDIR="$TMPDIR/src"
+
+mkdir -p $SRCDIR
+
+on_exit() {
+    mountpoint -q $SRCDIR && umount $SRCDIR || true
+    rm -rf $TMPDIR
+}
+
+trap "{ on_exit; kill 0; }" EXIT
+
+fail() {
+    echo $@ 1>&2
+    echo $@ >> $log
+    exit 1
+}
+
+if [ ! -f /oar_provisioned ]; then    
+    if [ -z $SRC ]; then
+        echo "TARBALL: $TARBALL" >> $log
+
+        [ -n "$TARBALL" ] || fail "error: You must provide a URL to a OAR tarball"
+        if [ ! -r "$TARBALL" ]; then
+            curl -L $TARBALL -o $TMPDIR/oar-tarball.tar.gz
+            TARBALL=$TMPDIR/oar-tarball.tar.gz
+        else
+            TARBALL="$(readlink -m $TARBALL)"
+        fi
+
+        SRCDIR=$SRCDIR/oar-${VERSION}
+        mkdir $SRCDIR && tar xf $TARBALL -C $SRCDIR --strip-components 1
+    else
+        SRC=/srv/$SRC
+        if [ -d $SRC ]; then
+            SRCDIR=$SRCDIR/src
+            mkdir $SRCDIR && cp -a $SRC/* $SRCDIR
+        else
+            fail "error: Directory $SRC does not exist"
+        fi
+    fi
+
+    if [ -e $SRCDIR/oar/__init__.py ]; then
+        VERSION_MAJOR=3
+    else
+        VERSION_MAJOR=2
+    fi
+    
+    echo "OAR_VERSION_MAJOR $VERSION_MAJOR" >> $log
+    
+    role=$(cat /etc/role)
+
     if [ "$role" == "server" ]
     then
-        echo "Provision OAR Server"
-        /common/oar2-server-install.sh >> $log_install || echo "oar2-server-install exit $?"
-        #/common/oar2-server-install.sh >> $log_install || (echo "oar2-server-install exit $?" | tee >> $log_install)
+        echo "Provisioning OAR Server"
+        /common/oar-server-install.sh $SRCDIR $VERSION_MAJOR >> $log || fail "oar-server-install exit $?"
 
         oar-database --create --db-is-local
         systemctl enable oar-server
@@ -23,19 +87,19 @@ if [ ! -f /oar_provisioned ]; then
     elif  [ "$role" == "node" ]
     then
         echo "Provision OAR Node"
-        bash /common/oar2-node-install.sh >> $log_install || echo "oar2-node-install exit $?"
+        bash /common/oar-node-install.sh $SRCDIR $VERSION_MAJOR >> $log || fail "oar-node-install exit $?"
         systemctl enable oar-node
         systemctl start oar-node 
         
     elif  [ "$role" == "frontend" ]
     then
-        echo "Provision OAR Frontend"
-        /common/oar2-frontend-install.sh >> $log_install || echo "oar2-frontend-install exit $?"
+        echo "Provisioning OAR Frontend" >> $log
+        /common/oar-frontend-install.sh $SRCDIR $VERSION_MAJOR >> $log || fail "oar-frontend-install exit $?"
     else
-        echo "Unkown or undefined role: $role"
+        fail "Unkown or undefined role: $role"
     fi
     touch /oar_provisioned
     
 else
-    echo "Already OAR provisioned !"
+    echo "Already OAR provisioned !" >> $log
 fi    

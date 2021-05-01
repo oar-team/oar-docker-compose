@@ -15,6 +15,7 @@ RUN apt-get update \
     make gcc \
     postgresql-client inetutils-ping git tmux openssh-server netcat \
     procps libdatetime-perl libterm-ui-perl rsync socat \
+    python3 python3-dev python3-pip python3-psycopg2 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -33,7 +34,6 @@ RUN rm -f /lib/systemd/system/multi-user.target.wants/* \
 
 RUN echo "DefaultTimeoutStartSec=5s" >> /etc/systemd/system.conf \
     && echo "DefaultTimeoutStopSec=5s" >> /etc/systemd/system.conf
-
 
 RUN cp /common/oardocker-provision.service /etc/systemd/system/ \
     && systemctl enable oardocker-provision.service
