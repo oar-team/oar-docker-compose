@@ -73,19 +73,20 @@ RUN apt-get update \
    libappconfig-perl libtie-ixhash-perl libwww-perl libcgi-fast-perl \
    libapache2-mod-fcgid php php-fpm libapache2-mod-php php-pgsql \
    libjs-jquery php-apcu spawn-fcgi fcgiwrap \
-   apache2 libapache2-mod-php
+   apache2 libapache2-mod-php \
+   && apt-get clean
 
-RUN apt-get install -y oar-web-status oar-user oar-user-pgsql oar-common \
-    && apt-get clean
+#RUN apt-get install -y oar-web-status oar-user oar-user-pgsql oar-common \
+#    && apt-get clean
 
-COPY --chown=oar:oar oar.conf /etc/oar/oar.conf
-COPY --chown=oar:oar --from=server /var/lib/oar/.ssh /var/lib/oar/.ssh
+#COPY --chown=oar:oar oar.conf /etc/oar/oar.conf
+#COPY --chown=oar:oar --from=server /var/lib/oar/.ssh /var/lib/oar/.ssh
 
 # Monika congiuration 
-RUN a2enmod cgi \
-    && sed -e "s/^\(hostname = \).*/\1server/" -i /etc/oar/monika.conf
+#RUN a2enmod cgi \
+#    && sed -e "s/^\(hostname = \).*/\1server/" -i /etc/oar/monika.conf
 
 # Drawgantt configuration 
-RUN sed -i "s/\$CONF\['db_server'\]=\"127.0.0.1\"/\$CONF\['db_server'\]=\"server\"/" /etc/oar/drawgantt-config.inc.php
+#RUN sed -i "s/\$CONF\['db_server'\]=\"127.0.0.1\"/\$CONF\['db_server'\]=\"server\"/" /etc/oar/drawgantt-config.inc.php
 
 CMD ["/lib/systemd/systemd"]

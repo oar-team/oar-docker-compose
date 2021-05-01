@@ -75,7 +75,7 @@ if [ ! -f /oar_provisioned ]; then
 
     if [ "$role" == "server" ]
     then
-        echo "Provisioning OAR Server"
+        echo "Provisioning OAR Server" >> $log
         /common/oar-server-install.sh $SRCDIR $VERSION_MAJOR >> $log || fail "oar-server-install exit $?"
 
         oar-database --create --db-is-local
@@ -98,6 +98,7 @@ if [ ! -f /oar_provisioned ]; then
     else
         fail "Unkown or undefined role: $role"
     fi
+
     touch /oar_provisioned
     
 else
