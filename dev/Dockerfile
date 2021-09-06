@@ -19,6 +19,10 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+# Intsall poetry at /root/.poetry/bin/poetry
+# The install script writes to .profile, but this file is not read when be open a shell so I use the full path to poetry
+RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3 -
+
 COPY common /common
 RUN chmod +x /common/*.sh
 

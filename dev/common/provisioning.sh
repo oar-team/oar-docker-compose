@@ -1,12 +1,12 @@
 #!/bin/bash
-set -ue
+set -uex
 
 trap 'echo trap signal TERM' 15 # HUP INT QUIT PIPE TERM
 
 log="/log_provisioning"
 
-if [ -f "/srv/.env_oar_provisoning.sh" ]; then
-    source /srv/.env_oar_provisoning.sh
+if [ -f "/src/.env_oar_provisoning.sh" ]; then
+    source /src/.env_oar_provisoning.sh
 fi
 
 : ''${AUTO_PROVISIONING=1}
@@ -39,7 +39,9 @@ fail() {
     exit 1
 }
 
-if [ ! -f /oar_provisioned ]; then    
+
+if [ ! -f /oar_provisioned ]; then
+
     if [ -z $SRC ]; then
         echo "TARBALL: $TARBALL" >> $log
 
@@ -51,6 +53,7 @@ if [ ! -f /oar_provisioned ]; then
             TARBALL="$(readlink -m $TARBALL)"
         fi
 
+        VERSION=$(echo $TARBALL | rev | cut -d / -f1 | rev | cut -d "." -f1)
         SRCDIR=$SRCDIR/oar-${VERSION}
         mkdir $SRCDIR && tar xf $TARBALL -C $SRCDIR --strip-components 1
     else
@@ -68,9 +71,7 @@ if [ ! -f /oar_provisioned ]; then
     else
         VERSION_MAJOR=2
     fi
-    
-    echo "OAR_VERSION_MAJOR $VERSION_MAJOR" >> $log
-    
+
     role=$(cat /etc/role)
 
     if [ "$role" == "server" ]

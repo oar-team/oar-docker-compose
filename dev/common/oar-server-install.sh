@@ -15,7 +15,8 @@ SRCDIR=$1
 VERSION_MAJOR=${2:-3}
 
 if (( VERSION_MAJOR==3 )); then
-    pip3 install $SRCDIR
+    cd $SRCDIR && /root/.poetry/bin/poetry build
+    pip3 install $SRCDIR/dist/*.whl
 fi
 
 # Install OAR server
@@ -55,5 +56,3 @@ chmod 600 /etc/oar/oar.conf
 
 ## the script provided by oar-2.5.8 failed w/ docker-compose 
 cp /common/job_resource_manager_cgroups.pl /etc/oar/job_resource_manager_cgroups.pl
-
-

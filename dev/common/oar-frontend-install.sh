@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ue
+set -uex
 
 fail() {
     echo $@ 1>&2
@@ -14,8 +14,13 @@ fi
 SRCDIR=$1
 VERSION_MAJOR=${2:-3}
 
+TOOLS_BUILD=""
+TOOLS_INSTALL=""
+TOOLS_SETUP=""
+
 if (( VERSION_MAJOR==3 )); then
-    pip3 install $SRCDIR
+    cd $SRCDIR && /root/.poetry/bin/poetry build
+    pip3 install $SRCDIR/dist/*.whl
 else
     TOOLS_BUILD="tools-build"
     TOOLS_INSTALL="tools-install"

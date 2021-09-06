@@ -15,7 +15,8 @@ SRCDIR=$1
 VERSION_MAJOR=${2:-3}
 
 if (( VERSION_MAJOR==3 )); then
-    pip3 install $SRCDIR
+    cd $SRCDIR && /root/.poetry/bin/poetry build
+    pip3 install $SRCDIR/dist/*.whl
 fi
 
 # Install OAR
