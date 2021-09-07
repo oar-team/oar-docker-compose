@@ -5,8 +5,8 @@ trap 'echo trap signal TERM' 15 # HUP INT QUIT PIPE TERM
 
 log="/log_provisioning"
 
-if [ -f "/src/.env_oar_provisoning.sh" ]; then
-    source /src/.env_oar_provisoning.sh
+if [ -f "/srv/.env_oar_provisoning.sh" ]; then
+    source /srv/.env_oar_provisoning.sh
 fi
 
 : ''${AUTO_PROVISIONING=1}
