@@ -11,6 +11,7 @@ fi
 
 : ''${AUTO_PROVISIONING=1}
 : ''${SRC:=""}
+: ''${FRONTEND_OAREXEC=false}
 #: ''${TARBALL:=""}
 : ''${TARBALL:="https://github.com/oar-team/oar3/archive/refs/heads/master.tar.gz"}
 
@@ -63,6 +64,7 @@ if [ ! -f /oar_provisioned ]; then
             mkdir $SRCDIR && cp -a $SRC/* $SRCDIR
         else
             fail "error: Directory $SRC does not exist"
+            exit 1
         fi
     fi
 
@@ -78,21 +80,21 @@ if [ ! -f /oar_provisioned ]; then
     then
         echo "Provisioning OAR Server" >> $log
         /common/oar-server-install.sh $SRCDIR $VERSION_MAJOR >> $log || fail "oar-server-install exit $?"
-
         oar-database --create --db-is-local
         systemctl enable oar-server
         systemctl start oar-server
         
         oarnodesetting -a -h node1
         oarnodesetting -a -h node2
-    elif  [ "$role" == "node" ]
+    elif  [ "$role" == "node" ] || [[ "$role" == "frontend" && $FRONTEND_OAREXEC ]]
     then
-        echo "Provision OAR Node"
+        echo "Provision OAR Node for $role"
         bash /common/oar-node-install.sh $SRCDIR $VERSION_MAJOR >> $log || fail "oar-node-install exit $?"
         systemctl enable oar-node
-        systemctl start oar-node 
-        
-    elif  [ "$role" == "frontend" ]
+        systemctl start oar-node
+    fi
+
+    if  [ "$role" == "frontend" ]
     then
         echo "Provisioning OAR Frontend" >> $log
         /common/oar-frontend-install.sh $SRCDIR $VERSION_MAJOR >> $log || fail "oar-frontend-install exit $?"
@@ -101,7 +103,7 @@ if [ ! -f /oar_provisioned ]; then
     fi
 
     touch /oar_provisioned
-    
+
 else
     echo "Already OAR provisioned !" >> $log
-fi    
+fi
