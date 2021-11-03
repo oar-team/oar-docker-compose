@@ -86,7 +86,7 @@ if [ ! -f /oar_provisioned ]; then
         
         oarnodesetting -a -h node1
         oarnodesetting -a -h node2
-    elif  [ "$role" == "node" ] || [[ "$role" == "frontend" && $FRONTEND_OAREXEC ]]
+    elif [ "$role" == "node" ] || [[ $FRONTEND_OAREXEC = true && "$role" == "frontend" ]];
     then
         echo "Provision OAR Node for $role"
         bash /common/oar-node-install.sh $SRCDIR $VERSION_MAJOR >> $log || fail "oar-node-install exit $?"
@@ -98,8 +98,6 @@ if [ ! -f /oar_provisioned ]; then
     then
         echo "Provisioning OAR Frontend" >> $log
         /common/oar-frontend-install.sh $SRCDIR $VERSION_MAJOR >> $log || fail "oar-frontend-install exit $?"
-    else
-        fail "Unkown or undefined role: $role"
     fi
 
     touch /oar_provisioned
