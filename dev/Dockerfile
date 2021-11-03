@@ -26,6 +26,9 @@ RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-
 COPY common /common
 RUN chmod +x /common/*.sh
 
+# Get access to python
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
 RUN /common/create_users.sh && /common/generate_ssh_keys.sh
 
 RUN rm -f /lib/systemd/system/multi-user.target.wants/* \
