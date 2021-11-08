@@ -69,6 +69,11 @@ CMD ["/lib/systemd/systemd"]
 FROM base as node
 RUN echo node > /etc/role
 
+COPY /common/oardocker-cgroup.service /etc/systemd/system/oardocker-cgroup.service
+COPY /common/prepare_oar_cgroup.sh /var/lib/container/init-scripts/prepare_oar_cgroup.sh
+
+RUN systemctl enable oardocker-cgroup
+
 CMD ["/lib/systemd/systemd"]
 
 # Frontend TODO
