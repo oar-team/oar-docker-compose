@@ -12,6 +12,7 @@ fi
 : ''${AUTO_PROVISIONING=1}
 : ''${SRC:=""}
 : ''${FRONTEND_OAREXEC=false}
+: ''${MIXED_INSTALL=false}
 #: ''${TARBALL:=""}
 : ''${TARBALL:="https://github.com/oar-team/oar3/archive/refs/heads/master.tar.gz"}
 
@@ -42,6 +43,13 @@ fail() {
 
 
 if [ ! -f /oar_provisioned ]; then
+
+    if [ $MIXED_INSTALL = true ]; then
+        echo "Provisioning mixed installation"
+        exec bash /common/provisioning_oar2_mixed.sh
+        echo "fail exec"
+        exit 1
+    fi
 
     if [ -z $SRC ]; then
         echo "TARBALL: $TARBALL" >> $log
