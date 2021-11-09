@@ -43,9 +43,9 @@ fi
 #    ln -sf /usr/local/share/oar/oar-server/job_resource_manager_cgroups.pl /etc/oar/job_resource_manager_cgroups.pl
 #fi
 if (( VERSION_MAJOR==3 )); then
-    cp /common/oar3.conf /etc/oar/oar.conf
+    cp /srv/common/oar3.conf /etc/oar/oar.conf
 else
-    cp /common/oar2.conf /etc/oar/oar.conf
+    cp /srv/common/oar2.conf /etc/oar/oar.conf
 fi
 
 chown oar:oar /etc/oar/oar.conf
