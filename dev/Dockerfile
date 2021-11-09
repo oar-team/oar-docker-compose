@@ -49,14 +49,16 @@ VOLUME [ "/sys/fs/cgroup" ]
 
 CMD ["/lib/systemd/systemd"]
 
+# I would like to intsall that only on server, but poetry installs
+# psycopg2 needed for oar, and it needs libpq-dev and postgresql-contrib.
+RUN apt-get update \
+    && apt-get install -y postgresql libpq-dev postgresql-contrib libjson-perl \
+    taktuk \
+    && apt-get clean
+
 FROM base as server
 
 RUN echo server > /etc/role
-
-RUN apt-get update \
-    && apt-get install -y postgresql libjson-perl \
-    taktuk \
-    && apt-get clean
 
 RUN postgresql_main=$(find /etc/postgresql -name "main") \
     && sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/" ${postgresql_main}/postgresql.conf \
