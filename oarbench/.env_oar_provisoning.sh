@@ -13,5 +13,5 @@ FRONTEND_OAREXEC=true
 # Note that SRC must point to an oar2 folder
 # The running oar server uses oar2, but one can use the oar3 scheduler
 MIXED_INSTALL=true
-#SRC_OAR3=oar3
+SRC_OAR3=oar3
 #TARBALL_OAR3="https://github.com/oar-team/oar3/archive/refs/heads/master.tar.gz"

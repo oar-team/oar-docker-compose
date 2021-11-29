@@ -51,14 +51,6 @@ fail() {
     exit 1
 }
 
-
-if [ $MIXED_INSTALL = true]; then
-    echo "Provisioning dual installation"
-    exec bash /common/provisioning_mixed.sh
-    echo "fail exec"
-    exit 1
-fi
-
 # Copy oar2 sources
 if [ -z $SRC ]; then
     echo "TARBALL: $TARBALL" >> $log
@@ -118,11 +110,8 @@ then
     echo "Provisioning OAR Server" >> $log
     /common/oar-server-install.sh $SRCDIR $VERSION_MAJOR >> $log || fail "oar-server-install exit $?"
     oar-database --create --db-is-local
-    systemctl enable oar-server
-    systemctl start oar-server
-
-    oarnodesetting -a -h node1
-    oarnodesetting -a -h node2
+    # systemctl enable oar-server
+    # systemctl start oar-server
 
     # Install OAR3 sources to install the oar3's scheduler
     cd $SRCDIR_OAR3 && /root/.poetry/bin/poetry build
@@ -130,21 +119,9 @@ then
 
     # Install oar3 scheduler
     ln -s /usr/local/bin/kamelot /usr/local/lib/oar/schedulers/
-    oarnotify --remove-queue default
-    oarnotify --add-queue default,2,kamelot
+    # oarnotify --remove-queue default
+    # oarnotify --add-queue default,2,kamelot
 
-elif [ "$role" == "node" ] || [[ $FRONTEND_OAREXEC = true && "$role" == "frontend" ]];
-then
-    echo "Provision OAR Node for $role"
-    bash /common/oar-node-install.sh $SRCDIR $VERSION_MAJOR >> $log || fail "oar-node-install exit $?"
-    systemctl enable oar-node
-    systemctl start oar-node
-fi
-
-if  [ "$role" == "frontend" ]
-then
-    echo "Provisioning OAR Frontend" >> $log
-    /common/oar-frontend-install.sh $SRCDIR $VERSION_MAJOR >> $log || fail "oar-frontend-install exit $?"
 fi
 
 touch /oar_provisioned

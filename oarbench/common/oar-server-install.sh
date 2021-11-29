@@ -37,6 +37,8 @@ fi
 
 if [ -f /usr/local/share/oar/oar-server/default/oar-server ]; then
     cat /usr/local/share/oar/oar-server/default/oar-server > /etc/default/oar-server
+    # Disable oar-server at boot time, we don't want the service to interfer with our benchmarks
+    # sed -i 's/#OAR_SERVER_NO_START_STOP/OAR_SERVER_NO_START_STOP/g' /etc/default/oar-server
 fi
 
 #if [ -f /usr/local/share/oar/oar-server/job_resource_manager_cgroups.pl ]; then
