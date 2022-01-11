@@ -1,4 +1,4 @@
-FROM debian:buster as base
+FROM debian:bullseye as base
 
 ENV container docker
 ENV LC_ALL C
@@ -10,7 +10,7 @@ RUN apt-get update \
     nano \
     perl perl-base openssh-client \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN rm -f /lib/systemd/system/multi-user.target.wants/* \
     /etc/systemd/system/*.wants/* \
@@ -31,6 +31,20 @@ VOLUME [ "/sys/fs/cgroup" ]
 CMD ["/lib/systemd/systemd"]
 
 FROM base as server
+
+# Python dependencies for oar3
+RUN apt-get update && \
+    apt-get install -y python3 \
+    python3-sqlalchemy python3-alembic \
+    python3-click python3-flask \
+    python3-passlib python3-psutil python3-requests \
+    python3-simplejson python3-sqlalchemy-utils  \
+    python3-tabulate python3-toml python3-yaml \
+    python3-zmq python3-psycopg2
+
+# Install procset
+COPY packages/python3-procset_3.0.0~rc1-1_all.deb /common/
+RUN dpkg -i /common/python3-procset_3.0.0~rc1-1_all.deb
 
 RUN apt-get update \
     && apt-get install -y oar-server oar-server-pgsql oar-user oar-user-pgsql postgresql libjson-perl \
@@ -62,7 +76,7 @@ RUN apt-get update \
     && apt-get install -y oar-node
 
 COPY --chown=oar:oar oar.conf /etc/oar/oar.conf
-# copy oar keys from server 
+# copy oar keys from server
 COPY --chown=oar:oar --from=server /var/lib/oar/.ssh /var/lib/oar/.ssh
 
 FROM base as frontend
