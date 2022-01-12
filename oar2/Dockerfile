@@ -75,6 +75,11 @@ FROM base as node
 RUN apt-get update \
     && apt-get install -y oar-node
 
+COPY /oardocker-cgroup.service /etc/systemd/system/oardocker-cgroup.service
+COPY /prepare_oar_cgroup.sh /var/lib/container/init-scripts/prepare_oar_cgroup.sh
+
+RUN systemctl enable oardocker-cgroup
+
 COPY --chown=oar:oar oar.conf /etc/oar/oar.conf
 # copy oar keys from server
 COPY --chown=oar:oar --from=server /var/lib/oar/.ssh /var/lib/oar/.ssh
