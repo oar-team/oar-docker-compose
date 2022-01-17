@@ -68,8 +68,8 @@ if [ ! -f /oar_provisioned ]; then
     else
         SRC=/srv/$SRC
         if [ -d $SRC ]; then
-            SRCDIR=$SRCDIR/src
-            mkdir $SRCDIR && cp -a $SRC/* $SRCDIR
+            SRCDIR=$SRC
+            # mkdir $SRCDIR && cp -a $SRC/* $SRCDIR
         else
             fail "error: Directory $SRC does not exist"
             exit 1

@@ -19,8 +19,9 @@ TOOLS_INSTALL=""
 TOOLS_SETUP=""
 
 if (( VERSION_MAJOR==3 )); then
-    cd $SRCDIR && /root/.poetry/bin/poetry build
-    pip3 install $SRCDIR/dist/*.whl
+    cd $SRCDIR && /root/.poetry/bin/poetry install
+    # pip3 install $SRCDIR/dist/*.whl
+    OARDIR=$(~/.poetry/bin/poetry env list --full-path)
 else
     TOOLS_BUILD="tools-build"
     TOOLS_INSTALL="tools-install"
