@@ -19,7 +19,7 @@ TOOLS_INSTALL=""
 TOOLS_SETUP=""
 
 if (( VERSION_MAJOR==3 )); then
-    cd $SRCDIR && /root/.poetry/bin/poetry install
+    cd $SRCDIR && POETRY_VIRTUALENVS_CREATE=false /root/.poetry/bin/poetry install
     # pip3 install $SRCDIR/dist/*.whl
     OARDIR=$(~/.poetry/bin/poetry env list --full-path)
 else
@@ -50,19 +50,34 @@ if [ -f /usr/local/share/oar/oar-node/default/oar-node ]; then
 fi
 
 # Configure OAR restful api for Apache2 TODO
-#rm -f /etc/oar/api-users
-#htpasswd -b -c /etc/oar/api-users docker docker
-#htpasswd -b /etc/oar/api-users oar oar
-#sed -i -e '1s@^/var/www.*@/usr/local/lib/cgi-bin@' /etc/apache2/suexec/www-data
-#a2enmod suexec
-#if [ $VERSION_MAJOR = "2" ]; then
-#    perl -i -pe 's/Require local/Require all granted/; s/#(ScriptAlias \/oarapi-priv)/$1/; $do=1 if /#<Location \/oarapi-priv>/; if ($do) { $do=0 if /#<\/Location>/; s/^#// }' /etc/oar/apache2/oar-restful-api.conf
-#else
-#    perl -i -pe 's/Require local/Require all granted/; $do=1 if /#<Location \/oarapi-priv>/; if ($do) { $do=0 if /#<\/Location>/; s/^#// }' /etc/oar/apache2/oar-restful-api.conf
-#fi
+a2enmod headers
+a2enmod rewrite
+
+rm -f /etc/oar/api-users
+htpasswd -b -c /etc/oar/api-users docker docker
+htpasswd -b /etc/oar/api-users oar oar
+# sed -i -e '1s@^/var/www.*@/usr/local/lib/cgi-bin@' /etc/apache2/suexec/www-data
+# a2enmod suexec
+if [ $VERSION_MAJOR = "2" ]; then
+    perl -i -pe 's/Require local/Require all granted/; s/#(ScriptAlias \/oarapi-priv)/$1/; $do=1 if /#<Location \/oarapi-priv>/; if ($do) { $do=0 if /#<\/Location>/; s/^#// }' /etc/oar/apache2/oar-restful-api.conf
+else
+    perl -i -pe 's/Require local/Require all granted/; $do=1 if /#<Location \/oarapi-priv>/; if ($do) { $do=0 if /#<\/Location>/; s/^#// }' /etc/oar/apache2/oar-restful-api.conf
+
+    # Enable mod_wsgi
+    # First install the mod with pip (official recommendations)
+    (cd $SRCDIR && /root/.poetry/bin/poetry run pip install mod_wsgi)
+    # mod_wsgi-express gives the configuration to put in the apache conf
+    LOAD_WSGI_MODULE=$(cd $SRCDIR && /root/.poetry/bin/poetry run mod_wsgi-express module-config | grep LoadModule)
+    LOAD_WSGI_HOME=$(cd $SRCDIR && /root/.poetry/bin/poetry run mod_wsgi-express module-config | grep WSGIPythonHome)
+    # Make the root home accessible for mod_wsgi to load python environements containing oar lib
+    chmod 777 -R /root
+    # Rewrite configuration
+    sed -i -e "s#%%LOAD_WSGI_MODULE%%#${LOAD_WSGI_MODULE}#" /etc/oar/apache2/oar-restful-api.conf
+    sed -i -e "s#%%LOAD_WSGI_HOME%%#${LOAD_WSGI_HOME}#" /etc/oar/apache2/oar-restful-api.conf
+fi
 # Fix auth header for newer Apache versions
-#sed -i -e "s/E=X_REMOTE_IDENT:/E=HTTP_X_REMOTE_IDENT:/" /etc/oar/apache2/oar-restful-api.conf
-# a2enconf oar-restful-api
+sed -i -e "s/E=X_REMOTE_IDENT:/E=HTTP_X_REMOTE_IDENT:/" /etc/oar/apache2/oar-restful-api.conf
+a2enconf oar-restful-api
 
 a2enmod cgi
 # Change cgi-bin path to /usr/local

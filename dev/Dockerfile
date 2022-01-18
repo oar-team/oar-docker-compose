@@ -88,6 +88,7 @@ RUN apt-get update \
    libapache2-mod-fcgid php php-fpm libapache2-mod-php php-pgsql \
    libjs-jquery php-apcu spawn-fcgi fcgiwrap \
    apache2 libapache2-mod-php \
+   apache2-dev # Needed for mod_wsgi \
    && apt-get clean
 
 #RUN apt-get install -y oar-web-status oar-user oar-user-pgsql oar-common \
