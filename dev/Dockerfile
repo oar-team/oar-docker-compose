@@ -1,4 +1,4 @@
-FROM debian:buster as base
+FROM debian:bullseye as base
 
 ENV container docker
 ENV LC_ALL C
