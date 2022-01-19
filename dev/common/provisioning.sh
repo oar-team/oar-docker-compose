@@ -30,7 +30,7 @@ mkdir -p $SRCDIR
 
 on_exit() {
     mountpoint -q $SRCDIR && umount $SRCDIR || true
-    rm -rf $TMPDIR
+    # rm -rf $TMPDIR
 }
 
 trap "{ on_exit; kill 0; }" EXIT
@@ -87,17 +87,17 @@ if [ ! -f /oar_provisioned ]; then
     if [ "$role" == "server" ]
     then
         echo "Provisioning OAR Server" >> $log
-        /common/oar-server-install.sh $SRCDIR $VERSION_MAJOR >> $log || fail "oar-server-install exit $?"
+        /srv/common/oar-server-install.sh $SRCDIR $VERSION_MAJOR >> $log || fail "oar-server-install exit $?"
         oar-database --create --db-is-local
         systemctl enable oar-server
         systemctl start oar-server
-        
+
         oarnodesetting -a -h node1
         oarnodesetting -a -h node2
     elif [ "$role" == "node" ] || [[ $FRONTEND_OAREXEC = true && "$role" == "frontend" ]];
     then
         echo "Provision OAR Node for $role"
-        bash /common/oar-node-install.sh $SRCDIR $VERSION_MAJOR >> $log || fail "oar-node-install exit $?"
+        bash /srv/common/oar-node-install.sh $SRCDIR $VERSION_MAJOR >> $log || fail "oar-node-install exit $?"
         systemctl enable oar-node
         systemctl start oar-node
     fi
@@ -105,7 +105,7 @@ if [ ! -f /oar_provisioned ]; then
     if  [ "$role" == "frontend" ]
     then
         echo "Provisioning OAR Frontend" >> $log
-        /common/oar-frontend-install.sh $SRCDIR $VERSION_MAJOR >> $log || fail "oar-frontend-install exit $?"
+        /srv/common/oar-frontend-install.sh $SRCDIR $VERSION_MAJOR >> $log || fail "oar-frontend-install exit $?"
     fi
 
     touch /oar_provisioned

@@ -21,7 +21,7 @@ TOOLS_SETUP=""
 if (( VERSION_MAJOR==3 )); then
     cd $SRCDIR && POETRY_VIRTUALENVS_CREATE=false /root/.poetry/bin/poetry install
     # pip3 install $SRCDIR/dist/*.whl
-    OARDIR=$(~/.poetry/bin/poetry env list --full-path)
+    # OARDIR="$(~/.poetry/bin/poetry env list --full-path | sed "s/ (Activated)//")/bin"
 else
     TOOLS_BUILD="tools-build"
     TOOLS_INSTALL="tools-install"
@@ -72,8 +72,8 @@ else
     # Make the root home accessible for mod_wsgi to load python environements containing oar lib
     chmod 777 -R /root
     # Rewrite configuration
-    sed -i -e "s#%%LOAD_WSGI_MODULE%%#${LOAD_WSGI_MODULE}#" /etc/oar/apache2/oar-restful-api.conf
-    sed -i -e "s#%%LOAD_WSGI_HOME%%#${LOAD_WSGI_HOME}#" /etc/oar/apache2/oar-restful-api.conf
+    sed -i "12i ${LOAD_WSGI_MODULE}" /etc/oar/apache2/oar-restful-api.conf
+    sed -i "12i ${LOAD_WSGI_HOME}" /etc/oar/apache2/oar-restful-api.conf
 fi
 # Fix auth header for newer Apache versions
 sed -i -e "s/E=X_REMOTE_IDENT:/E=HTTP_X_REMOTE_IDENT:/" /etc/oar/apache2/oar-restful-api.conf

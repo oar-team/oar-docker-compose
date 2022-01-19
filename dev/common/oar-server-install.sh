@@ -15,9 +15,9 @@ SRCDIR=$1
 VERSION_MAJOR=${2:-3}
 
 if (( VERSION_MAJOR==3 )); then
-    cd $SRCDIR && /root/.poetry/bin/poetry install
+    cd $SRCDIR && POETRY_VIRTUALENVS_CREATE=false /root/.poetry/bin/poetry install
+    # cd $SRCDIR && /root/.poetry/bin/poetry build
     # pip3 install $SRCDIR/dist/*.whl
-    OARDIR=$(~/.poetry/bin/poetry env list --full-path)
 fi
 
 # Install OAR server
