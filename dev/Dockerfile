@@ -87,8 +87,7 @@ RUN apt-get update \
    libappconfig-perl libtie-ixhash-perl libwww-perl libcgi-fast-perl \
    libapache2-mod-fcgid php php-fpm libapache2-mod-php php-pgsql \
    libjs-jquery php-apcu spawn-fcgi fcgiwrap \
-   apache2 libapache2-mod-php \
-   apache2-dev # Needed for mod_wsgi \
+   apache2 libapache2-mod-php libapache2-mod-wsgi-py3 \
    && apt-get clean
 
 #RUN apt-get install -y oar-web-status oar-user oar-user-pgsql oar-common \

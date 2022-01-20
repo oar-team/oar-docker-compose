@@ -62,18 +62,6 @@ if [ $VERSION_MAJOR = "2" ]; then
     perl -i -pe 's/Require local/Require all granted/; s/#(ScriptAlias \/oarapi-priv)/$1/; $do=1 if /#<Location \/oarapi-priv>/; if ($do) { $do=0 if /#<\/Location>/; s/^#// }' /etc/oar/apache2/oar-restful-api.conf
 else
     perl -i -pe 's/Require local/Require all granted/; $do=1 if /#<Location \/oarapi-priv>/; if ($do) { $do=0 if /#<\/Location>/; s/^#// }' /etc/oar/apache2/oar-restful-api.conf
-
-    # Enable mod_wsgi
-    # First install the mod with pip (official recommendations)
-    (cd $SRCDIR && /root/.poetry/bin/poetry run pip install mod_wsgi)
-    # mod_wsgi-express gives the configuration to put in the apache conf
-    LOAD_WSGI_MODULE=$(cd $SRCDIR && /root/.poetry/bin/poetry run mod_wsgi-express module-config | grep LoadModule)
-    LOAD_WSGI_HOME=$(cd $SRCDIR && /root/.poetry/bin/poetry run mod_wsgi-express module-config | grep WSGIPythonHome)
-    # Make the root home accessible for mod_wsgi to load python environements containing oar lib
-    chmod 777 -R /root
-    # Rewrite configuration
-    sed -i "12i ${LOAD_WSGI_MODULE}" /etc/oar/apache2/oar-restful-api.conf
-    sed -i "12i ${LOAD_WSGI_HOME}" /etc/oar/apache2/oar-restful-api.conf
 fi
 # Fix auth header for newer Apache versions
 sed -i -e "s/E=X_REMOTE_IDENT:/E=HTTP_X_REMOTE_IDENT:/" /etc/oar/apache2/oar-restful-api.conf
