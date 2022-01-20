@@ -13,7 +13,7 @@ fi
 : ''${SRC:=""}
 : ''${FRONTEND_OAREXEC=false}
 : ''${MIXED_INSTALL=false}
-#: ''${TARBALL:=""}
+: ''${LIVE_RELOAD=false}
 : ''${TARBALL:="https://github.com/oar-team/oar3/archive/refs/heads/master.tar.gz"}
 
 if (( $AUTO_PROVISIONING==0 )); then
@@ -68,12 +68,29 @@ if [ ! -f /oar_provisioned ]; then
     else
         SRC=/srv/$SRC
         if [ -d $SRC ]; then
-            SRCDIR=$SRC
-            # mkdir $SRCDIR && cp -a $SRC/* $SRCDIR
+            SRCDIR=$SRCDIR/src
+            mkdir $SRCDIR && cp -a $SRC/* $SRCDIR
         else
             fail "error: Directory $SRC does not exist"
             exit 1
         fi
+
+        if [ $LIVE_RELOAD = true ]; then
+            echo "Activate live reload"
+
+            # Names can be confuging. SRCDIR is the folder (on your laptop) containing the oar3 sources.
+            echo "SRCDIR=$SRC" > /etc/.test
+            # TMPDIR is a folder inside the docker used to avoid conflicts between the containers (node1,2, frontend, server)
+            echo "TMPDIR=$SRCDIR" >> /etc/.test
+
+            cat /srv/common/live-reload.service > /etc/systemd/system/live-reload.service
+            systemctl enable live-reload
+            # Starting the service here could conflicts wit the following of this script
+            # which will also install oar3.
+            # But as long as the oar3 folder is not modified it should not be triggered.
+            systemctl start live-reload
+        fi
+
     fi
 
     if [ -e $SRCDIR/oar/__init__.py ]; then

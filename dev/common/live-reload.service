@@ -1,0 +1,12 @@
+[Unit]
+Description=Watch change in oar sources and redploy the python scritps
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/.test
+ExecStart=/bin/bash /srv/common/watch-oar.sh $SRCDIR $TMPDIR
+# TimeoutSec=0
+RemainAfterExit=on
+
+[Install]
+WantedBy=multi-user.target

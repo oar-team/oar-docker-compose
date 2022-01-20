@@ -16,6 +16,7 @@ RUN apt-get update \
     postgresql-client inetutils-ping git tmux openssh-server netcat \
     procps libdatetime-perl libterm-ui-perl rsync socat \
     python3 python3-dev python3-pip python3-psycopg2 \
+    inotify-tools \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 

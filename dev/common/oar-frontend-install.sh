@@ -19,9 +19,8 @@ TOOLS_INSTALL=""
 TOOLS_SETUP=""
 
 if (( VERSION_MAJOR==3 )); then
-    cd $SRCDIR && POETRY_VIRTUALENVS_CREATE=false /root/.poetry/bin/poetry install
-    # pip3 install $SRCDIR/dist/*.whl
-    # OARDIR="$(~/.poetry/bin/poetry env list --full-path | sed "s/ (Activated)//")/bin"
+    cd $SRCDIR && /root/.poetry/bin/poetry build
+    pip3 install $SRCDIR/dist/*.whl
 else
     TOOLS_BUILD="tools-build"
     TOOLS_INSTALL="tools-install"
