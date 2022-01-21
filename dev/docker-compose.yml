@@ -17,6 +17,7 @@ services:
     privileged: true
     ports:
       - 8000:80
+      - 6668:6668
     build:
       context: .
       target: frontend
