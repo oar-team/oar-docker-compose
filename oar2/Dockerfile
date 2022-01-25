@@ -51,9 +51,14 @@ RUN apt-get update \
     taktuk \
     && apt-get clean
 
+# Enable provisionning script that initializes the database and the nodes
+COPY /common/provisioning.sh /var/lib/container/init-scripts/provisioning.sh
+COPY /common/oardocker-provision.service /etc/systemd/system/oardocker-provision.service
+RUN systemctl enable oardocker-provision.service
+
 # Import oar.conf
-COPY --chown=oar:oar oar.conf /etc/oar/oar.conf
-COPY --chown=oar:oar job_resource_manager_cgroups.pl /etc/oar/job_resource_manager_cgroups.pl
+COPY --chown=oar:oar /common/oar.conf /etc/oar/oar.conf
+COPY --chown=oar:oar /common/job_resource_manager_cgroups.pl /etc/oar/job_resource_manager_cgroups.pl
 
 RUN postgresql_main=$(find /etc/postgresql -name "main") \
     && sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/" ${postgresql_main}/postgresql.conf \
@@ -63,8 +68,7 @@ RUN postgresql_main=$(find /etc/postgresql -name "main") \
 RUN systemctl disable oar-server
 RUN systemctl enable postgresql
 
-COPY prepare_oar_cgroup.sh /prepare_oar_cgroup.sh
-COPY provisioning.sh /provisioning.sh
+COPY /common/prepare_oar_cgroup.sh /prepare_oar_cgroup.sh
 
 RUN chmod +x /*.sh
 
@@ -75,12 +79,12 @@ FROM base as node
 RUN apt-get update \
     && apt-get install -y oar-node
 
-COPY /oardocker-cgroup.service /etc/systemd/system/oardocker-cgroup.service
-COPY /prepare_oar_cgroup.sh /var/lib/container/init-scripts/prepare_oar_cgroup.sh
+COPY /common/oardocker-cgroup.service /etc/systemd/system/oardocker-cgroup.service
+COPY /common/prepare_oar_cgroup.sh /var/lib/container/init-scripts/prepare_oar_cgroup.sh
 
 RUN systemctl enable oardocker-cgroup
 
-COPY --chown=oar:oar oar.conf /etc/oar/oar.conf
+COPY --chown=oar:oar /common/oar.conf /etc/oar/oar.conf
 # copy oar keys from server
 COPY --chown=oar:oar --from=server /var/lib/oar/.ssh /var/lib/oar/.ssh
 
@@ -96,7 +100,7 @@ RUN apt-get update \
 RUN apt-get install -y oar-web-status oar-user oar-user-pgsql oar-common \
     && apt-get clean
 
-COPY --chown=oar:oar oar.conf /etc/oar/oar.conf
+COPY --chown=oar:oar /common/oar.conf /etc/oar/oar.conf
 COPY --chown=oar:oar --from=server /var/lib/oar/.ssh /var/lib/oar/.ssh
 
 # Monika congiuration 
