@@ -16,7 +16,9 @@ VERSION_MAJOR=${2:-3}
 
 if (( VERSION_MAJOR==3 )); then
     cd $SRCDIR && /root/.poetry/bin/poetry build
-    pip3 install $SRCDIR/dist/*.whl
+    pip install $SRCDIR/dist/*.whl
+    # Idk, but the first install some scripts are not deployed
+    pip install $SRCDIR/dist/*.whl --force-reinstall
 fi
 
 # Install OAR server
@@ -55,4 +57,4 @@ chmod 600 /etc/oar/oar.conf
 /common/configure_oar_ssh_keys.sh
 
 ## the script provided by oar-2.5.8 failed w/ docker-compose 
-cp /common/job_resource_manager_cgroups.pl /etc/oar/job_resource_manager_cgroups.pl
+# cp /common/job_resource_manager_cgroups.pl /etc/oar/job_resource_manager_cgroups.pl

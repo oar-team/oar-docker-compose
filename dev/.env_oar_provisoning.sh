@@ -3,7 +3,6 @@ SRC=oar3
 # Enable the frontend to act as a node.
 # In case of job deploy, the oarexec can be executed on the frontend.
 FRONTEND_OAREXEC=false
-SRC=oar3
 LIVE_RELOAD=true
 #SRC=oar2-src
 #TARBALL="https://github.com/oar-team/oar/archive/refs/heads/master.tar.gz"

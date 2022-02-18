@@ -16,7 +16,7 @@ services:
     hostname: frontend
     privileged: true
     ports:
-      - 8000:80
+      - 8000:8000
       - 6668:6668
     build:
       context: .
