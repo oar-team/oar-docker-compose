@@ -27,3 +27,31 @@ Live reload can be activated with `LIVE_RELOAD=true` in `dev/.env_oar_provisioni
 It take some time to redeploy oar, so the changes might not be visible directly.
 
 It is possible to follow the activity of the reload service you can use `journalctl -u live-reload.service`.
+
+**However, keep in mind that some services such as almighty needs to be restarted for the changes to take effects.**
+
+### Start fastapi
+
+The new version of OAR's RestAPI is developed with Fastapi, and its deployment is not automatised yet.
+
+First, add the port 8001 (its an example, and is configured in the command below).
+To add the port, edit `docker-compose.yml` at the section frontend such as:
+
+```yml
+  frontend:
+    hostname: frontend
+    privileged: true
+    ports:
+      - 8000:8000
+      - 8001:8001 # <---- HERE
+      - 6668:6668
+```
+
+Then, to start the API, use the following command after running `docker-compose up`.
+
+```bash
+docker exec --user oar --env OARCONFFILE=/etc/oar/oar.conf dev_frontend_1 uvicorn oar.api.app:app --port 8001 --host 0.0.0.0
+```
+
+The API should now be accessible in your browser at the address localhost:8001 (try http://localhost:8001/docs).
+
