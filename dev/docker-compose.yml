@@ -17,6 +17,7 @@ services:
     privileged: true
     ports:
       - 8000:8000
+      - 8001:8001
       - 6668:6668
     build:
       context: .
