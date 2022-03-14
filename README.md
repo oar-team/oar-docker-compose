@@ -13,11 +13,26 @@
 
 The folder `dev` contains a setup for oar developers.
 
+### Debian version
+
+The docker images are based on debian stable: bullseye. To change the debian version edit the Dockerfile.
+For instance, change `FROM debian:bullseye as base` for `FROM debian:bookworm as base`.
+
 ### configuration
 
 The file `dev/.env_oar_provisioning.sh` contains configuration parameters that will be forwarded to dev/common/provisioning.sh (in charge of installing oar).
 
 The variable `SRC` points to your oar sources. And needs to be available from the root of the dev folder (i.e `dev/oar3`) so it can be mounted in the dockers.
+
+- If you leave `SRC` empty the sources will be fetched from github on the branch master (very unstable).
+- To work from your sources, you can clone the repository at `dev/oar3-your-clone`, and set `SRC=oar3-your-clone`.
+
+## Provisioning
+
+The installation of OAR is not done when the docker images are built (using `docker build` or `docker-compose build`) but when the dockers are first launched.
+The installation is done by the script `dev/common/provisioning.sh`, and is executed when the images are started as a systemd service.
+To follow its activity, you can use the command `systemctl status oardocker-provision.service`, when the script exits (with success) OAR should be installed and ready.
+
 
 ### Live reload
 
