@@ -13,7 +13,9 @@ fi
 
 : ''${AUTO_PROVISIONING=1}
 : ''${SRC:=""}
+
 : ''${FRONTEND_OAREXEC=false}
+: ''${SRC_OAR3=""}
 #: ''${TARBALL:=""}
 : ''${TARBALL:="https://github.com/oar-team/oar/archive/refs/heads/master.tar.gz"}
 : ''${TARBALL_OAR3:="https://github.com/oar-team/oar3/archive/refs/heads/master.tar.gz"}
@@ -49,14 +51,6 @@ fail() {
     exit 1
 }
 
-
-if [ $MIXED_INSTALL = true]; then
-    echo "Provisioning dual installation"
-    exec bash /common/provisioning_mixed.sh
-    echo "fail exec"
-    exit 1
-fi
-
 # Copy oar2 sources
 if [ -z $SRC ]; then
     echo "TARBALL: $TARBALL" >> $log
@@ -84,10 +78,11 @@ else
 fi
 
 # Copy oar3 files
-if [ -z $SRC_OAR3 ]; then
-    echo "TARBALL: $TARBALL_OAR3" >> $log
+if [ -z "$SRC_OAR3" ]; then
+    echo "TARBALL OAR3: $TARBALL_OAR3" >> $log
 
     [ -n "$TARBALL_OAR3" ] || fail "error: You must provide a URL to a OAR tarball"
+
     if [ ! -r "$TARBALL_OAR3" ]; then
         curl -L $TARBALL_OAR3 -o $TMPDIR/oar-tarball.tar.gz
         TARBALL_OAR3=$TMPDIR/oar-tarball.tar.gz
