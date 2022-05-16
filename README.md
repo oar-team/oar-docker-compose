@@ -70,3 +70,15 @@ docker exec --user oar --env OARCONFFILE=/etc/oar/oar.conf dev_frontend_1 uvicor
 
 The API should now be accessible in your browser at the address localhost:8001 (try http://localhost:8001/docs).
 
+
+## Visualization
+You can access the OAR's two webapp tools for visualizing the resources utilization via the host:
+
+- **Monika** \
+which displays the current state of resources as well as all running and waiting jobs \
+http://localhost:8000/monika
+
+- **Drawgantt** \
+which displays gantt chart of nodes and jobs for the past and future \
+http://localhost:8000/drawgantt/
+
