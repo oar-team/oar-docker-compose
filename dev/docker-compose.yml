@@ -12,11 +12,15 @@ services:
     volumes:
       - .:/srv
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    networks:
+      - oar
+
   frontend:
     hostname: frontend
     privileged: true
     ports:
       - 8000:80
+      - 8001:8001 # <---- HERE
       - 6668:6668
     build:
       context: .
@@ -28,6 +32,9 @@ services:
     volumes:
       - .:/srv
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    networks:
+      - oar
+
   node1:
     hostname: node1
     privileged: true
@@ -41,6 +48,9 @@ services:
     volumes:
       - .:/srv
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    networks:
+      - oar
+
   node2:
     hostname: node2
     privileged: true
@@ -54,3 +64,29 @@ services:
     volumes:
       - .:/srv
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    networks:
+      - oar
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-oar@oar.test}
+      PGADMIN_DEFAULT_USER: ${PGADMIN_DEFAULT_USER:-oar}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-oar}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+       - pgadmin:/var/lib/pgadmin
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    restart: unless-stopped
+    networks:
+      - oar
+
+networks:
+  oar:
+    driver: bridge
+
+volumes:
+    pgadmin:
+
