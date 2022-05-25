@@ -82,3 +82,11 @@ http://localhost:8000/monika
 which displays gantt chart of nodes and jobs for the past and future \
 http://localhost:8000/drawgantt/
 
+
+- **pgADMIN** \
+which displays the PostgreSQL with GUI\
+http://localhost:5050 \
+Use \
+hostname: *server* \
+User, Password, DB: *oar*
+
