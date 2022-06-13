@@ -35,24 +35,7 @@ services:
     networks:
       - oar
 
-  node1:
-    hostname: node1
-    privileged: true
-    build:
-      context: .
-      target: node
-    tmpfs:
-      - /tmp
-      - /run
-      - /run/lock
-    volumes:
-      - .:/srv
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    networks:
-      - oar
-
-  node2:
-    hostname: node2
+  node:
     privileged: true
     build:
       context: .

@@ -1,5 +1,7 @@
 #AUTO_PROVISIONING=1
 SRC=""
+NODES=8
+CPUS=2 # per node
 # Enable the frontend to act as a node.
 # In case of job deploy, the oarexec can be executed on the frontend.
 FRONTEND_OAREXEC=false
