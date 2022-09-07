@@ -143,23 +143,10 @@ if [ ! -f /oar_provisioned ]; then
             wait
         done
 
-        node=0
-        cpu=0
-        node=0
-        for ((core=1;core<=$totalcores; core++)); do
-
-            if (((core-1)%(cpus*cores)==0)); then
-                node=$((node + 1))
-            fi
-
-            if (((core-1)%cores==0)); then
-                cpu=$((cpu + 1))
-            fi
-
-            echo $node $cpu $core $(((core-1)%cores)) >> $log
-            oarnodesetting -r $core -p "cpu=$cpu" -p "core=$core" -p "cpuset=$(((core-1)%cores))" -p mem=$mem &
-            wait
-        done
+        if [ ! -z $OAR_CONF ]; then
+            echo "install local conf ${OAR_CONF}"
+            cp /srv/${OAR_CONF} /etc/oar/oar.conf
+        fi
 
     elif [ "$role" == "node" ] || [[ $FRONTEND_OAREXEC = true && "$role" == "frontend" ]];
     then
@@ -173,6 +160,11 @@ if [ ! -f /oar_provisioned ]; then
     then
         echo "Provisioning OAR Frontend" >> $log
         /srv/common/oar-frontend-install.sh $SRCDIR $VERSION_MAJOR >> $log || fail "oar-frontend-install exit $?"
+
+        if [ ! -z $OAR_CONF ]; then
+            echo "install local conf ${OAR_CONF}"
+            cp /srv/${OAR_CONF} /etc/oar/oar.conf
+        fi
     fi
 
     touch /oar_provisioned
