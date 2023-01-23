@@ -1,6 +1,6 @@
 #AUTO_PROVISIONING=1
-SRC="oar3/master"
-NODES=4
+#SRC="oar3/master"
+NODES=2
 CPUS=2 # per node
 # Enable the frontend to act as a node.
 # In case of job deploy, the oarexec can be executed on the frontend.
@@ -8,7 +8,7 @@ FRONTEND_OAREXEC=false
 LIVE_RELOAD=false
 
 # Test to override the default oar conf in the image
-OAR_CONF="./oar3-test.conf"
+#OAR_CONF="./oar3-test.conf"
 #SRC=oar2-src
 #TARBALL="https://github.com/oar-team/oar/archive/refs/heads/master.tar.gz"
 #TARBALL="https://github.com/oar-team/oar3/archive/refs/heads/master.tar.gz"
