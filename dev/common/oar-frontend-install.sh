@@ -19,7 +19,7 @@ TOOLS_INSTALL=""
 TOOLS_SETUP=""
 
 if (( VERSION_MAJOR==3 )); then
-    cd $SRCDIR && /root/.poetry/bin/poetry build
+    cd $SRCDIR && /root/.local/bin/poetry build
     pip3 install $SRCDIR/dist/*.whl
 else
     TOOLS_BUILD="tools-build"

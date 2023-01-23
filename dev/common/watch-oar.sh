@@ -10,7 +10,7 @@ while true; do
 
   inotifywait -e modify,create,delete,move -r ${SRCDIR} && \
     rsync -r ${SRCDIR}/* ${TMPDIR} && \
-    cd ${TMPDIR} && /root/.poetry/bin/poetry build && \
+    cd ${TMPDIR} && /root/.local/bin/poetry build && \
     pip install dist/*.whl --force-reinstall
   echo "event"
 

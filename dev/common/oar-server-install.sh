@@ -15,7 +15,7 @@ SRCDIR=$1
 VERSION_MAJOR=${2:-3}
 
 if (( VERSION_MAJOR==3 )); then
-    cd $SRCDIR && /root/.poetry/bin/poetry build
+    cd $SRCDIR && /root/.local/bin/poetry build
     pip3 install $SRCDIR/dist/*.whl
 fi
 

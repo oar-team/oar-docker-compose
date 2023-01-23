@@ -118,7 +118,7 @@ then
     oarnodesetting -a -h node2
 
     # Install OAR3 sources to install the oar3's scheduler
-    cd $SRCDIR_OAR3 && /root/.poetry/bin/poetry build
+    cd $SRCDIR_OAR3 && /root/.local/bin/poetry build
     pip3 install $SRCDIR_OAR3/dist/*.whl
 
 elif [ "$role" == "node" ] || [[ $FRONTEND_OAREXEC = true && "$role" == "frontend" ]];
